@@ -8,7 +8,7 @@ const board = JSON.parse(localStorage.getItem('board')) || defaultBoard
 
 export default new Vuex.Store({
   state: {
-    board
+    board: defaultBoard
   },
   mutations: {}
 })
