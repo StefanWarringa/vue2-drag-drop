@@ -6,12 +6,17 @@
                 {{col.name}}
               </div>
               <div class="list-reset">
-                <div class="task" v-for="(task,$taskidx) in col.tasks" :key="$taskidx">
+                <div class="task" v-for="(task,$taskidx) in col.tasks" :key="$taskidx" @click="openTask(task)">
                   <span class="w-full flex-no-shrink font-bold">{{task.name}}</span>
                   <p v-if="task.description" class="w-full flex-no-shrink mt-2 text-sm">{{task.description}}</p>
                 </div>
               </div>
             </div>
+        </div>
+
+        <!-- Don't close when clicking on the card itself  -->
+        <div class="task-bg" v-if="this.$route.name === 'task'" @click.self="closeTask">
+            <router-view/>
         </div>
     </div>
 </template>
@@ -20,7 +25,16 @@
     import {mapState} from 'vuex'
 
     export default {
-        computed: mapState(['board'])
+        computed: mapState(['board']),
+        methods: {
+            openTask(task) {
+                this.$router.push({name: 'task', params: {id: task.id} })
+            },
+
+            closeTask() {
+                this.$router.back()
+            }
+        }
     }
 </script>
 
