@@ -3,17 +3,18 @@
         <div class="flex flex-row items-start">
             <div class="column"
                  v-for="(col, $colidx) of board.columns" :key="$colidx"
-                 @drop="moveTask($event,$colidx)"
+                 @drop="receiveDrop($event,$colidx)"
+                 draggable
                  @dragover.prevent
-                 @dragenter.prevent>
-
+                 @dragenter.prevent
+                 @dragstart.self="pickupColumn($event, $colidx)">
                 <div class="flex items-center mb-4 font-bold">
                     {{col.name}}
                 </div>
 
                 <div class="list-reset">
                     <div class="task"
-                         v-for="(task,$taskidx) in col.tasks" :key="$taskidx"
+                         v-for="(task, $taskidx) in col.tasks" :key="$taskidx"
                          @click="openTask(task)"
                          draggable
                          @dragstart="pickupTask($event,$colidx,$taskidx)">
@@ -59,8 +60,30 @@ export default {
     pickupTask(evt,fromColumnIndex,taskIndex){
       evt.dataTransfer.dropEffect = 'move'
       evt.dataTransfer.effectAllowed = 'move'
+      evt.dataTransfer.setData('drop-type', 'task')
       evt.dataTransfer.setData('from-column-index', fromColumnIndex)
       evt.dataTransfer.setData('task-index', taskIndex)
+    },
+    pickupColumn(evt,fromColumnIndex){
+        evt.dataTransfer.dropEffect = 'move'
+        evt.dataTransfer.effectAllowed = 'move'
+        evt.dataTransfer.setData('drop-type', 'column')
+        evt.dataTransfer.setData('from-column-index', fromColumnIndex)
+    },
+    receiveDrop(evt, columnIndex) {
+        const dropType = evt.dataTransfer.getData('drop-type')
+        console.log('receiveDrop ', dropType)
+
+        switch (dropType) {
+            case 'task':
+                this.moveTask(evt, columnIndex)
+                break
+            case 'column':
+                this.moveColumn(evt, columnIndex)
+                break
+            default:
+                evt.cancel()
+        }
     },
     moveTask(evt, toColumnIndex){
         const fromColumnIndex = evt.dataTransfer.getData('from-column-index');
@@ -69,6 +92,13 @@ export default {
             fromColumnIndex: fromColumnIndex,
             toColumnIndex: toColumnIndex,
             taskIndex: taskIndex
+        })
+    },
+    moveColumn(evt, toColumnIndex){
+        const fromColumnIndex = evt.dataTransfer.getData('from-column-index');
+        this.$store.commit('MOVE_COLUMN',{
+            fromColumnIndex: fromColumnIndex,
+            toColumnIndex: toColumnIndex
         })
     }
   }
