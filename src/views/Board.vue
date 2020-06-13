@@ -29,6 +29,15 @@
                             @keyup.enter="createTask(col.tasks,$event)">
                 </div>
             </div>
+            <div class="column flex">
+                <input
+                   type="text"
+                   placeholder="New column"
+                   class="p-2 mr-2 flex-grow"
+                   v-model="newColumnName"
+                   @keyup.enter="createColumn"
+                />
+            </div>
         </div>
 
         <!-- Don't close when clicking on the card itself  -->
@@ -42,8 +51,17 @@
 import { mapState } from 'vuex'
 
 export default {
+  data () {
+    return {
+      newColumnName: ''
+    }
+  },
   computed: mapState(['board']),
   methods: {
+    createColumn () {
+      this.$store.commit('CREATE_COLUMN', { name: this.newColumnName })
+      this.newColumnName = ''
+    },
     openTask (task) {
       this.$router.push({ name: 'task', params: { id: task.id } })
     },
