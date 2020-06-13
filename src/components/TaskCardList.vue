@@ -9,15 +9,13 @@
             {{column.name}}
         </div>
         <div class="list-reset">
-            <div class="task"
-                 v-for="(task, $taskIndex) in column.tasks" :key="$taskIndex"
-                 @click="openTask(task)"
-                 draggable
-                 @dragstart="pickupTask($event,index,$taskIndex)"
-                 @drop="receiveDrop($event,index,$taskIndex)">
-                <span class="w-full flex-no-shrink font-bold">{{task.name}}</span>
-                <p v-if="task.description" class="w-full flex-no-shrink mt-2 text-sm">{{task.description}}</p>
-            </div>
+            <TaskCard
+              v-for="(task, $taskIndex) in column.tasks"
+              :key="$taskIndex"
+              :columnIndex="index"
+              :taskIndex="$taskIndex"
+              :task="task"
+            />
             <input
               type="text"
               class="block p-2 w-full bg-transparent"
@@ -29,8 +27,11 @@
 </template>
 
 <script>
+import TaskCard from '@/components/TaskCard'
+
 export default {
   name: 'TaskCardList',
+  components: { TaskCard },
   props: {
     column: { type: Object, required: true },
     index: { type: Number, required: true }
@@ -42,16 +43,6 @@ export default {
         { tasks, name: evt.target.value }
       )
       evt.target.value = ''
-    },
-    openTask (task) {
-      this.$router.push({ name: 'task', params: { id: task.id } })
-    },
-    pickupTask (evt, fromColumnIndex, taskIndex) {
-      evt.dataTransfer.dropEffect = 'move'
-      evt.dataTransfer.effectAllowed = 'move'
-      evt.dataTransfer.setData('drop-type', 'task')
-      evt.dataTransfer.setData('from-column-index', fromColumnIndex)
-      evt.dataTransfer.setData('from-task-index', taskIndex)
     },
     pickupColumn (evt, fromColumnIndex) {
       evt.dataTransfer.dropEffect = 'move'
