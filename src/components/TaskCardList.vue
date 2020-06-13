@@ -1,10 +1,10 @@
 <template>
     <div class="column"
-         @drop="receiveDrop($event)"
+         @drop="dispatchDrop($event)"
          draggable
          @dragover.prevent
          @dragenter.prevent
-         @dragstart.self="pickupColumn($event, columnIndex)">
+         @dragstart.self="pickupColumn($event)">
         <div class="flex items-center mb-4 font-bold">
             {{column.name}}
         </div>
@@ -28,10 +28,12 @@
 
 <script>
 import TaskCard from '@/components/TaskCard'
+import DragBehaviourMixin from '@/mixins/DragBehaviourMixin'
 
 export default {
   name: 'TaskCardList',
   components: { TaskCard },
+  mixins: [ DragBehaviourMixin ],
   props: {
     column: { type: Object, required: true },
     columnIndex: { type: Number, required: true }
@@ -43,46 +45,6 @@ export default {
         { tasks, name: evt.target.value }
       )
       evt.target.value = ''
-    },
-    pickupColumn (evt) {
-      evt.dataTransfer.dropEffect = 'move'
-      evt.dataTransfer.effectAllowed = 'move'
-      evt.dataTransfer.setData('drop-type', 'column')
-      evt.dataTransfer.setData('from-column-index', this.columnIndex.toString())
-    },
-    receiveDrop (evt) {
-      const dropType = evt.dataTransfer.getData('drop-type')
-      switch (dropType) {
-        case 'task':
-          this.moveTask(evt)
-          // Prevent drop to propagate to containing column when drop-target is task
-          evt.stopPropagation()
-          break
-        case 'column':
-          this.moveColumn(evt)
-          // Prevent drop to propagate to containing column when drop-target is task
-          evt.stopPropagation()
-          break
-        default:
-          evt.cancel()
-      }
-    },
-    moveTask (evt) {
-      const fromColumnIndex = evt.dataTransfer.getData('from-column-index')
-      const fromTaskIndex = evt.dataTransfer.getData('from-task-index')
-      this.$store.commit('MOVE_TASK', {
-        fromColumnIndex: fromColumnIndex,
-        fromTaskIndex: fromTaskIndex,
-        toColumnIndex: this.columnIndex,
-        toTaskIndex: this.taskIndex
-      })
-    },
-    moveColumn (evt) {
-      const fromColumnIndex = evt.dataTransfer.getData('from-column-index')
-      this.$store.commit('MOVE_COLUMN', {
-        fromColumnIndex: fromColumnIndex,
-        toColumnIndex: this.columnIndex
-      })
     }
   }
 }
