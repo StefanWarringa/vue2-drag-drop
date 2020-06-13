@@ -39,67 +39,67 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
-    computed: mapState(['board']),
-    methods: {
-    openTask(task) {
-        this.$router.push({name: 'task', params: {id: task.id}})
+  computed: mapState(['board']),
+  methods: {
+    openTask (task) {
+      this.$router.push({ name: 'task', params: { id: task.id } })
     },
-    closeTask() {
-        this.$router.back()
+    closeTask () {
+      this.$router.back()
     },
-    createTask(tasks, evt){
+    createTask (tasks, evt) {
       this.$store.commit(
         'CREATE_TASK',
-        {tasks,name: evt.target.value}
+        { tasks, name: evt.target.value }
       )
       evt.target.value = ''
     },
-    pickupTask(evt,fromColumnIndex,taskIndex){
+    pickupTask (evt, fromColumnIndex, taskIndex) {
       evt.dataTransfer.dropEffect = 'move'
       evt.dataTransfer.effectAllowed = 'move'
       evt.dataTransfer.setData('drop-type', 'task')
       evt.dataTransfer.setData('from-column-index', fromColumnIndex)
       evt.dataTransfer.setData('task-index', taskIndex)
     },
-    pickupColumn(evt,fromColumnIndex){
-        evt.dataTransfer.dropEffect = 'move'
-        evt.dataTransfer.effectAllowed = 'move'
-        evt.dataTransfer.setData('drop-type', 'column')
-        evt.dataTransfer.setData('from-column-index', fromColumnIndex)
+    pickupColumn (evt, fromColumnIndex) {
+      evt.dataTransfer.dropEffect = 'move'
+      evt.dataTransfer.effectAllowed = 'move'
+      evt.dataTransfer.setData('drop-type', 'column')
+      evt.dataTransfer.setData('from-column-index', fromColumnIndex)
     },
-    receiveDrop(evt, columnIndex) {
-        const dropType = evt.dataTransfer.getData('drop-type')
-        console.log('receiveDrop ', dropType)
+    receiveDrop (evt, columnIndex) {
+      const dropType = evt.dataTransfer.getData('drop-type')
+      console.log('receiveDrop ', dropType)
 
-        switch (dropType) {
-            case 'task':
-                this.moveTask(evt, columnIndex)
-                break
-            case 'column':
-                this.moveColumn(evt, columnIndex)
-                break
-            default:
-                evt.cancel()
-        }
+      switch (dropType) {
+        case 'task':
+          this.moveTask(evt, columnIndex)
+          break
+        case 'column':
+          this.moveColumn(evt, columnIndex)
+          break
+        default:
+          evt.cancel()
+      }
     },
-    moveTask(evt, toColumnIndex){
-        const fromColumnIndex = evt.dataTransfer.getData('from-column-index');
-        const taskIndex = evt.dataTransfer.getData('task-index');
-        this.$store.commit('MOVE_TASK',{
-            fromColumnIndex: fromColumnIndex,
-            toColumnIndex: toColumnIndex,
-            taskIndex: taskIndex
-        })
+    moveTask (evt, toColumnIndex) {
+      const fromColumnIndex = evt.dataTransfer.getData('from-column-index')
+      const taskIndex = evt.dataTransfer.getData('task-index')
+      this.$store.commit('MOVE_TASK', {
+        fromColumnIndex: fromColumnIndex,
+        toColumnIndex: toColumnIndex,
+        taskIndex: taskIndex
+      })
     },
-    moveColumn(evt, toColumnIndex){
-        const fromColumnIndex = evt.dataTransfer.getData('from-column-index');
-        this.$store.commit('MOVE_COLUMN',{
-            fromColumnIndex: fromColumnIndex,
-            toColumnIndex: toColumnIndex
-        })
+    moveColumn (evt, toColumnIndex) {
+      const fromColumnIndex = evt.dataTransfer.getData('from-column-index')
+      this.$store.commit('MOVE_COLUMN', {
+        fromColumnIndex: fromColumnIndex,
+        toColumnIndex: toColumnIndex
+      })
     }
   }
 }
