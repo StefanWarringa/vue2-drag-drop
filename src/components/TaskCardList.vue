@@ -1,10 +1,10 @@
 <template>
     <div class="column"
-         @drop="receiveDrop($event,index)"
+         @drop="receiveDrop($event)"
          draggable
          @dragover.prevent
          @dragenter.prevent
-         @dragstart.self="pickupColumn($event, index)">
+         @dragstart.self="pickupColumn($event, columnIndex)">
         <div class="flex items-center mb-4 font-bold">
             {{column.name}}
         </div>
@@ -12,7 +12,7 @@
             <TaskCard
               v-for="(task, $taskIndex) in column.tasks"
               :key="$taskIndex"
-              :columnIndex="index"
+              :columnIndex="columnIndex"
               :taskIndex="$taskIndex"
               :task="task"
             />
@@ -34,7 +34,7 @@ export default {
   components: { TaskCard },
   props: {
     column: { type: Object, required: true },
-    index: { type: Number, required: true }
+    columnIndex: { type: Number, required: true }
   },
   methods: {
     createTask (tasks, evt) {
@@ -44,22 +44,22 @@ export default {
       )
       evt.target.value = ''
     },
-    pickupColumn (evt, fromColumnIndex) {
+    pickupColumn (evt) {
       evt.dataTransfer.dropEffect = 'move'
       evt.dataTransfer.effectAllowed = 'move'
       evt.dataTransfer.setData('drop-type', 'column')
-      evt.dataTransfer.setData('from-column-index', fromColumnIndex)
+      evt.dataTransfer.setData('from-column-index', this.columnIndex.toString())
     },
-    receiveDrop (evt, columnIndex, taskIndex) {
+    receiveDrop (evt) {
       const dropType = evt.dataTransfer.getData('drop-type')
       switch (dropType) {
         case 'task':
-          this.moveTask(evt, columnIndex, taskIndex)
+          this.moveTask(evt)
           // Prevent drop to propagate to containing column when drop-target is task
           evt.stopPropagation()
           break
         case 'column':
-          this.moveColumn(evt, columnIndex)
+          this.moveColumn(evt)
           // Prevent drop to propagate to containing column when drop-target is task
           evt.stopPropagation()
           break
@@ -67,21 +67,21 @@ export default {
           evt.cancel()
       }
     },
-    moveTask (evt, toColumnIndex, toTaskIndex) {
+    moveTask (evt) {
       const fromColumnIndex = evt.dataTransfer.getData('from-column-index')
       const fromTaskIndex = evt.dataTransfer.getData('from-task-index')
       this.$store.commit('MOVE_TASK', {
         fromColumnIndex: fromColumnIndex,
         fromTaskIndex: fromTaskIndex,
-        toColumnIndex: toColumnIndex,
-        toTaskIndex: toTaskIndex
+        toColumnIndex: this.columnIndex,
+        toTaskIndex: this.taskIndex
       })
     },
-    moveColumn (evt, toColumnIndex) {
+    moveColumn (evt) {
       const fromColumnIndex = evt.dataTransfer.getData('from-column-index')
       this.$store.commit('MOVE_COLUMN', {
         fromColumnIndex: fromColumnIndex,
-        toColumnIndex: toColumnIndex
+        toColumnIndex: this.columnIndex
       })
     }
   }

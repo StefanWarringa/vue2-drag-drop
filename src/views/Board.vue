@@ -4,7 +4,7 @@
             <TaskCardList
               v-for="(col, $colidx) of board.columns" :key="$colidx"
               :column="col"
-              :index="$colidx"
+              :columnIndex="$colidx"
             />
             <div class="column flex">
                 <input

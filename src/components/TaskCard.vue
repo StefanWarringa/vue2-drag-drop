@@ -32,9 +32,12 @@ export default {
       const dropType = evt.dataTransfer.getData('drop-type')
       switch (dropType) {
         case 'task':
-          const fromColumnIndex = evt.dataTransfer.getData('from-column-index')
-          const fromTaskIndex = evt.dataTransfer.getData('from-task-index')
-          this.moveTask(evt, fromColumnIndex, fromTaskIndex)
+          this.moveTask(evt)
+          // Prevent drop to propagate to containing column when drop-target is task
+          evt.stopPropagation()
+          break
+        case 'column':
+          this.moveColumn(evt)
           // Prevent drop to propagate to containing column when drop-target is task
           evt.stopPropagation()
           break
@@ -42,7 +45,9 @@ export default {
           evt.cancel()
       }
     },
-    moveTask (evt, fromColumnIndex, fromTaskIndex) {
+    moveTask (evt) {
+      const fromColumnIndex = evt.dataTransfer.getData('from-column-index')
+      const fromTaskIndex = evt.dataTransfer.getData('from-task-index')
       this.$store.commit('MOVE_TASK', {
         fromColumnIndex: fromColumnIndex,
         fromTaskIndex: fromTaskIndex,
