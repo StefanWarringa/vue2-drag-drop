@@ -5,12 +5,24 @@ import { uuid } from './utils'
 
 Vue.use(Vuex)
 
-const board = JSON.parse(localStorage.getItem('board')) || defaultBoard
+const STORAGE_KEY = 'trello_clone_board'
+const board = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultBoard
+
+const saveStatePlugin = store => {
+  store.subscribe(
+    (mutation, state) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.board))
+    }
+  )
+}
 
 export default new Vuex.Store({
   state: {
     board: board
   },
+  plugins: [
+    saveStatePlugin
+  ],
   getters: {
     getTaskById (state) {
       return (id) => {
