@@ -43,6 +43,9 @@ export default new Vuex.Store({
         tasks: []
       })
     },
+    UPDATE_COLUMN (state, { column, key, value }) {
+      Vue.set(column, key, value)
+    },
     CREATE_TASK (state, { tasks, name }) {
       tasks.push({
         id: uuid(),
